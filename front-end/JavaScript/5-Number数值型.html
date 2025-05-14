@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        // 字面量声明变量
+        var a = 1
+        console.log(a);
+        
+        // 对象
+        var b = new Number(2.2)
+        console.log(b);
+        
+        //判断是否为整数
+        console.log(Number.isInteger(a))
+
+        var c = 2.354684
+        // 保留小数
+        console.log(c.toFixed(2));
+        
+        // 判断是不是数字
+        console.log(isNaN(c));
+        
+        var x = 0.1+0.2
+        console.log(x);     //浮点数精度问题，输出0.30000000000000004
+        // 解决方法
+        console.log(x.toFixed(2))
+        
+    </script>
+</body>
+</html>
