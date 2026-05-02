@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1.2 HTML5 全特性深度解析</title>
+  
+  <!-- 【IE 兼容处理】针对 IE9 以下浏览器无法识别 H5 语义化标签的问题 -->
+  <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+  <![endif]-->
+
+  <style>
+    :root { --primary: #42b983; --bg: #f8fcfb; --card: #ffffff; --text: #34495e; --border: #e8f3ee; }
+    body { font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; background: var(--bg); color: var(--text); padding: 20px; line-height: 1.6; }
+    h1 { text-align: center; color: var(--primary); margin-bottom: 40px; }
+    h2 { border-left: 4px solid var(--primary); padding-left: 12px; margin-top: 30px; font-size: 1.4em; }
+    
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+    
+    code { background: #f1f3f1; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.9em; }
+    .api-demo { background: #333; color: #42b983; padding: 15px; border-radius: 6px; font-family: 'Courier New', Courier, monospace; margin: 10px 0; min-height: 40px; white-space: pre-wrap; }
+    
+    /* 交互效果 */
+    button { background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+    button:hover { opacity: 0.9; transform: translateY(-1px); }
+    canvas { background: #fff; border: 1px solid #ddd; display: block; margin: 10px 0; }
+    
+    /* 辅助类 */
+    .deprecated { color: #e74c3c; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <h1>HTML5 核心特性复习全书</h1>
+
+  <!-- 1. 语义化与文档增强 -->
+  <section class="card">
+    <h2>1. 语义化标签与 DOM 扩展</h2>
+    <p>除了常用的 <code>header</code>, <code>footer</code>, <code>nav</code>, <code>main</code>, <code>section</code>, <code>article</code> 外，还有：</p>
+    <ul>
+      <li><strong>figure & figcaption:</strong> 独立流内容（如图表、照片）及其标题。</li>
+      <li><strong>details & summary:</strong> 原生折叠组件。</li>
+      <li><strong>mark:</strong> 高亮文本。</li>
+      <li><strong>time:</strong> 机器可读的时间/日期。</li>
+      <li><strong>ruby, rt, rp:</strong> 东亚文字注音。</li>
+      <li><strong>dialog:</strong> 原生对话框（支持 <code>.showModal()</code>）。</li>
+    </ul>
+    
+    <div class="demo-box">
+      <details>
+        <summary>点击查看 <ruby>谢<rt>xiè</rt></ruby> 的 Ruby 注音演示</summary>
+        <p>这是在 <mark>HTML5</mark> 中原生的折叠效果。</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- 2. 表单 2.0 -->
+  <section class="card">
+    <h2>2. 增强型表单（Input Types & Attributes）</h2>
+    <form oninput="res.value=parseInt(rng.value)">
+      <div class="grid">
+        <div>
+          <h4>新增 Type:</h4>
+          <input type="email" placeholder="Email" required><br>
+          <input type="url" placeholder="URL: http://..."><br>
+          <input type="tel" placeholder="Telephone"><br>
+          <input type="number" min="0" max="100" step="10"><br>
+          <input type="range" id="rng" value="20"> <output name="res" for="rng">20</output><br>
+          <input type="date"> <input type="color" value="#42b983">
+        </div>
+        <div>
+          <h4>核心属性:</h4>
+          <ul>
+            <li><code>autocomplete</code>: 开启/关闭自动完成。</li>
+            <li><code>autofocus</code>: 页面加载后自动获取焦点。</li>
+            <li><code>multiple</code>: 允许上传多个文件或输入多个邮箱。</li>
+            <li><code>pattern</code>: 强大的正则校验（例如：<code>[A-Z]{3}</code>）。</li>
+            <li><code>placeholder</code>: 占位提示。</li>
+            <li><code>required</code>: 必填校验。</li>
+            <li><code>formaction</code>: 覆盖 form 的 action，实现一个表单多个提交地址。</li>
+          </ul>
+        </div>
+      </div>
+      <p><strong>datalist:</strong> 输入框建议列表</p>
+      <input list="browsers" placeholder="输入浏览器名...">
+      <datalist id="browsers">
+        <option value="Chrome"><option value="Firefox"><option value="Safari">
+      </datalist>
+    </form>
+  </section>
+
+  <!-- 3. 图形与多媒体 -->
+  <section class="card">
+    <h2>3. 绘图与多媒体 (Canvas, SVG, Media)</h2>
+    <div class="grid">
+      <div>
+        <h4>Canvas (位图)</h4>
+        <canvas id="cvs" width="200" height="100"></canvas>
+        <small>适合：高性能游戏、像素级处理。</small>
+      </div>
+      <div>
+        <h4>SVG (矢量图)</h4>
+        <svg width="100" height="100">
+          <circle cx="50" cy="50" r="40" stroke="#42b983" stroke-width="4" fill="white" />
+        </svg>
+        <small>适合：图标、简单动画、无限缩放。</small>
+      </div>
+    </div>
+    <h4>Video & Audio</h4>
+    <p>支持 <code>controls</code>, <code>autoplay</code>, <code>loop</code>, <code>muted</code> (静音自动播放策略), 以及 <code>poster</code> (封面)。</p>
+    <p><strong>progress & meter:</strong></p>
+    任务进度：<progress value="70" max="100"></progress>
+    磁盘占用：<meter min="0" max="100" low="30" high="80" optimum="50" value="90"></meter>
+  </section>
+
+  <!-- 4. 存储与性能 API -->
+  <section class="card">
+    <h2>4. 存储、性能与后台 (Web Storage, Worker, rAF)</h2>
+    <div class="grid">
+      <div id="storage-demo">
+        <h4>Storage:</h4>
+        <button onclick="testLS()">测试 LocalStorage</button>
+        <button onclick="testSS()">测试 SessionStorage</button>
+      </div>
+      <div>
+        <h4>性能控制:</h4>
+        <ul>
+          <li><strong>requestAnimationFrame:</strong> 60FPS 丝滑动画，节能高效。</li>
+          <li><strong>Web Worker:</strong> 开启后台线程，不阻塞 UI 渲染。</li>
+          <li><strong>Application Cache:</strong> <span class="deprecated">已废弃</span> (了解即可，现被 Service Worker 替代)。</li>
+        </ul>
+      </div>
+    </div>
+    <div class="api-demo" id="perf-out">等待 API 指令...</div>
+  </section>
+
+  <!-- 5. 设备能力与交互 -->
+  <section class="card">
+    <h2>5. 设备能力与系统级 API (Geolocation, File, Drag)</h2>
+    <div class="grid">
+      <div>
+        <h4>位置与文件:</h4>
+        <button onclick="getGeo()">获取地理位置</button>
+        <input type="file" id="filePicker" style="margin-top:10px;">
+        <button onclick="testNotify()">发送通知</button>
+      </div>
+      <div>
+        <h4>交互 API:</h4>
+        <ul>
+          <li><strong>Drag and Drop:</strong> 原生拖放支持。</li>
+          <li><strong>Clipboard API:</strong> 现代异步剪切板操作。</li>
+          <li><strong>History API:</strong> <code>pushState</code>/<code>replaceState</code> (单页应用路由核心)。</li>
+          <li><strong>Fullscreen API:</strong> <code>requestFullscreen()</code>。</li>
+        </ul>
+      </div>
+    </div>
+    <div id="drag-zone" style="border: 2px dashed #ccc; height: 60px; margin-top:15px; text-align:center; line-height:60px;">
+      拖动文件到此区域测试 Drag API
+    </div>
+    <div class="api-demo" id="device-out">控制台消息展示...</div>
+  </section>
+
+  <!-- 6. 通信 API -->
+  <section class="card">
+    <h2>6. 通信与跨文档消息 (WebSocket, SSE, PostMessage)</h2>
+    <ul>
+      <li><strong>WebSocket:</strong> 全双工通信，<code>ws://</code> 协议。</li>
+      <li><strong>SSE (Server-Sent Events):</strong> 服务器推送，<code>EventSource</code>。</li>
+      <li><strong>postMessage:</strong> 跨域页面/iframe 之间的安全通信。</li>
+    </ul>
+  </section>
+
+  <script>
+    const perfOut = document.getElementById('perf-out');
+    const devOut = document.getElementById('device-out');
+
+    /* --- 1. Canvas 绘制 --- */
+    const ctx = document.getElementById('cvs').getContext('2d');
+    ctx.fillStyle = '#42b983';
+    ctx.fillRect(10, 10, 150, 80);
+    ctx.fillStyle = '#fff';
+    ctx.fillText('Canvas 渲染', 50, 50);
+
+    /* --- 2. requestAnimationFrame --- */
+    let rotation = 0;
+    function animate() {
+      rotation += 1;
+      // 可以在这里更新 UI
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    /* --- 3. Web Storage --- */
+    function testLS() {
+      localStorage.setItem('user', 'Xie');
+      perfOut.innerText = `LocalStorage 已存入: ${localStorage.getItem('user')}`;
+    }
+    function testSS() {
+      sessionStorage.setItem('temp_id', '999');
+      perfOut.innerText = `SessionStorage 已存入: ${sessionStorage.getItem('temp_id')}`;
+    }
+
+    /* --- 4. 地理定位 Geolocation --- */
+    function getGeo() {
+      devOut.innerText = "定位中...";
+      navigator.geolocation.getCurrentPosition(
+        p => devOut.innerText = `位置: 精度 ${p.coords.longitude}, 纬度 ${p.coords.latitude}`,
+        e => devOut.innerText = `定位失败: ${e.message}`
+      );
+    }
+
+    /* --- 5. 通知 Notification --- */
+    function testNotify() {
+      Notification.requestPermission().then(p => {
+        if(p === 'granted') new Notification("复习进度提醒", { body: "1.2 模块复习进度 100%！" });
+      });
+    }
+
+    /* --- 6. 文件 API (FileReader) --- */
+    document.getElementById('filePicker').onchange = function(e) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onload = () => devOut.innerText = `已读取文件: ${file.name}, 大小: ${file.size} bytes`;
+      reader.readAsText(file);
+    };
+
+    /* --- 7. 拖拽 API --- */
+    const dz = document.getElementById('drag-zone');
+    dz.ondragover = e => e.preventDefault();
+    dz.ondrop = e => {
+      e.preventDefault();
+      devOut.innerText = `已接收到拖拽目标: ${e.dataTransfer.files[0]?.name || '非文件目标'}`;
+    };
+
+    /* --- 8. Web Worker 简易演示 --- */
+    try {
+      const blob = new Blob(["onmessage = (e) => postMessage('Worker收到: ' + e.data)"]);
+      const worker = new Worker(URL.createObjectURL(blob));
+      worker.onmessage = e => console.log(e.data);
+      worker.postMessage("Hello Worker");
+    } catch(e) {}
+
+  </script>
+</body>
+</html>

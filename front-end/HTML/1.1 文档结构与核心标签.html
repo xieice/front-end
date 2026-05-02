@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<!-- 【知识点】声明文档类型，告诉浏览器使用 HTML5 标准 -->
+<html lang="zh-CN">
+<head>
+  <!-- 【知识点】字符编码设置 -->
+  <meta charset="UTF-8">
+  <!-- 【知识点】视口配置，移动端适配的核心 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- 【知识点】元数据：描述、关键词（SEO相关） -->
+  <meta name="description" content="前端复习-HTML基础">
+  <meta name="keywords" content="HTML, 基础, 复习">
+  <title>1.1 HTML 基础回顾 </title>
+  
+  <style>
+    :root { --green: #42b983; --light-green: #f0f9f4; --text: #2c3e50; }
+    body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #fff; color: var(--text); line-height: 1.6; padding: 20px; }
+    header { border-bottom: 2px solid var(--green); padding-bottom: 10px; margin-bottom: 20px; }
+    h1, h2 { color: var(--green); }
+    .card { border: 1px solid #eee; border-radius: 8px; padding: 15px; margin-bottom: 20px; background: var(--light-green); }
+    code { background: #e8f5e9; padding: 2px 5px; border-radius: 4px; color: #1b5e20; }
+    table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background: var(--green); color: white; }
+    .demo-box { border: 2px dashed var(--green); padding: 10px; margin: 10px 0; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>1.1 HTML 基础回顾</h1>
+    <p>涵盖标准结构、语义化、全表单元素及属性</p>
+  </header>
+
+  <!-- 【知识点】语义化标签：nav, main, section, article -->
+  <nav>
+    <b>快速索引：</b>
+    <a href="#structure">基础结构</a> | <a href="#form">深度表单</a> | <a href="#media">媒体与链接</a>
+  </nav>
+
+  <main>
+    <section id="structure" class="card">
+      <h2>一、基础与语义化标签</h2>
+      <!-- 【知识点】h1-h6, p, div, span -->
+      <div class="demo-box">
+        <h3>标题级别测试</h3>
+        <p>这是一个段落。使用 <code>&lt;span&gt;</code> 进行 <span>行内样式</span> 区分。</p>
+      </div>
+
+      <!-- 【知识点】语义化块：article, aside -->
+      <article>
+        <h4>语义化内容区 (article)</h4>
+        <p>独立的内容块，如博客文章。</p>
+        <aside>这是侧边栏内容 (aside)，通常放相关链接或广告。</aside>
+      </article>
+
+      <!-- 【知识点】列表：ul, ol, li, dl, dt, dd -->
+      <h4>列表展示</h4>
+      <ul>
+        <li>无序列表项</li>
+      </ul>
+      <dl>
+        <dt>定义术语 (dt)</dt>
+        <dd>术语的描述说明 (dd)</dd>
+      </dl>
+    </section>
+
+    <section id="form" class="card">
+      <h2>二、表单元素与属性（深度覆盖）</h2>
+      <form action="#" method="get" id="mainForm">
+        <!-- 【知识点】fieldset & legend：对表单进行分组 -->
+        <fieldset>
+          <legend>用户信息分组</legend>
+          
+          <!-- 【知识点】label for 与 id 绑定 -->
+          <label for="uname">账号 (required + pattern):</label>
+          <input type="text" id="uname" name="uname" 
+                 placeholder="字母开头，5-10位" 
+                 required 
+                 pattern="[a-zA-Z][a-zA-Z0-9]{4,9}">
+          
+          <br><br>
+
+          <!-- 【知识点】select, optgroup, option -->
+          <label>所属部门:</label>
+          <select name="dept">
+            <optgroup label="技术部">
+              <option value="security">网络安全</option>
+              <option value="frontend" selected>前端开发</option>
+            </optgroup>
+            <optgroup label="行政部">
+              <option value="hr">人力资源</option>
+            </optgroup>
+          </select>
+        </fieldset>
+
+        <br>
+
+        <!-- 【知识点】textarea, button 类型 -->
+        <label>个人简介:</label><br>
+        <textarea name="bio" rows="4" cols="30" placeholder="支持多行输入..."></textarea>
+        
+        <br><br>
+        
+        <!-- 【知识点】各种按钮类型 -->
+        <button type="submit">提交 (Submit)</button>
+        <button type="reset">重置 (Reset)</button>
+        <button type="button" onclick="alert('纯按钮')">普通按钮 (Button)</button>
+      </form>
+    </section>
+
+    <section id="media" class="card">
+      <h2>三、表格、链接与多媒体</h2>
+      <!-- 【知识点】表格全结构：thead, tbody, tfoot, tr, th, td, caption -->
+      <table>
+        <caption>宿舍值日表</caption>
+        <thead>
+          <tr><th>成员</th><th>职责</th><th>备注</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>xiexie</td><td>系统维护</td><td>负责服务器</td></tr>
+          <tr><td>cc</td><td>地面清洁</td><td>-</td></tr>
+        </tbody>
+        <tfoot>
+          <tr><td colspan="3">备注：每周一轮换</td></tr>
+        </tfoot>
+      </table>
+
+      <!-- 【知识点】超链接：target, download, 锚点 -->
+      <p>
+        <a href="https://google.com" target="_blank" rel="noopener">新窗口打开外部链接</a> |
+        <a href="#mainForm">跳转至本页表单(锚点)</a>
+      </p>
+
+      <!-- 【知识点】图片属性：alt, title, loading -->
+      <img src="https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white" alt="示例图" title="悬停提示" loading="lazy">
+
+      <!-- 【知识点】iframe 与代码标签 -->
+      <h4>框架与代码：</h4>
+      <code>console.log("Hello World");</code>
+      <pre>
+        &lt;div&gt;
+          这是预格式化文本
+        &lt;/div&gt;
+      </pre>
+      <iframe src="about:blank" frameborder="0" width="100%" height="50"></iframe>
+    </section>
+  </main>
+
+  <!-- 【知识点】footer 语义 -->
+  <footer>
+    <hr>
+    <p style="text-align:center;">&copy; 2026 前端基础复习 - 1.1 完结</p>
+  </footer>
+</body>
+</html>
