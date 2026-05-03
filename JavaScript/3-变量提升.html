@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        console.log(a)
+        var a = 1
+
+        //上面两行相当于下面三行
+        var b   //变量提升  var a;  //先给初始值a = undefined
+        console.log(b)
+        b = 1
+
+        console.log(b)
+
+        var c  = 2
+        console.log(c)
+
+
+        function x(){
+            if(true){
+                console.log(a)
+            }
+            var a = 1    //变量提升  var a;
+        }
+        x()
+    </script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>JS闭包</title>
+</head>
+<body>
+    <h1>147 - JS闭包</h1>
+    <p>
+    闭包：函数嵌套函数 + 引用外部变量。
+    </p>
+    闭包会造成循环引用，导致内存泄漏，在IE中可能会导致内存泄露。<br>
+    解决方法是，在退出函数之前，将不使用的局部变量全部删除。
+
+     ```javascript
+     function createFunctions() {
+         var result = new Array();
+
+         for (var i = 0; i < 10; i++) {
+             result[i] = function () {
+                 return i;
+             };
+         }
+
+         return result;
+     }
+     <script>
+        function createFunctions() {
+            var result = new Array();
+
+            for (var i = 0; i < 10; i++) {
+                result[i] = function () {
+                    return i;
+                };
+            }
+
+            return result;
+        }
+
+        var functions = createFunctions();
+
+        for (var i = 0; i < functions.length; i++) {
+            console.log(functions[i]());
+        }
+
+     </script>
+</body>
+</html>
