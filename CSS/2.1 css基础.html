@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>2.1 CSS 基础 </title>
+  
+  <!-- 【引入方式 3: 外链】推荐方式，解耦且可缓存 -->
+  <!-- <link rel="stylesheet" href="style.css"> -->
+
+  <style>
+    /* 【引入方式 2: 内联/内部】 */
+    /* 【引入方式 4: 导入】不推荐，加载慢，最后执行 */
+    /* @import url("other.css"); */
+
+    :root { 
+      --primary-green: #42b983; 
+      --light-bg: #f9fdfb; 
+      --border-color: #e0eee8;
+    }
+
+    body { font-family: system-ui; background: var(--light-bg); color: #333; padding: 40px; }
+
+    /* 【选择器: 通配符】性能损耗最大 */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* 【CSS 继承】这些属性会自动向下传递 */
+    section { 
+      color: #2c3e50; 
+      font-size: 16px; 
+      line-height: 1.8;
+      border: 1px solid var(--border-color); /* border 不继承 */
+      background: #fff;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+    }
+
+    /* 【选择器: 标签 & 类 & ID】 */
+    h2 { color: var(--primary-green); margin-bottom: 15px; }
+    .highlight { color: #e67e22; font-weight: bold; }
+    #unique-box { border: 2px solid var(--primary-green); }
+
+    /* 【选择器: 属性选择器】 */
+    input[type="text"] { border: 1px solid #ccc; padding: 5px; }
+
+    /* 【选择器: 伪类 & 伪元素】 */
+    a:hover { color: #35495e; text-decoration: underline; } /* 伪类：状态 */
+    p::first-line { font-weight: bold; } /* 伪元素：内容片段 */
+    .box::after { content: " [后缀]"; color: #999; }
+
+    /* --- 核心：优先级演示 --- */
+    .priority-test { color: blue; }         /* 类: 10 */
+    div.priority-test { color: green; }     /* 标签+类: 1 + 10 = 11 */
+    #id-selector { color: orange; }         /* ID: 100 */
+    /* !important > 行内(1000) > ID(100) > 类(10) > 标签(1) > 通配符(0) */
+
+    /* --- 核心：盒模型 --- */
+    .standard-box {
+      box-sizing: content-box; /* 标准盒模型：宽 = content */
+      width: 200px; padding: 20px; border: 10px solid #ddd;
+    }
+    .border-box {
+      box-sizing: border-box; /* 怪异盒模型：宽 = content + padding + border */
+      width: 200px; padding: 20px; border: 10px solid #42b983;
+    }
+
+    /* --- 元素显示类型 --- */
+    .block-el { display: block; background: #eee; margin: 5px 0; }
+    .inline-el { display: inline; background: #ddd; }
+    .inline-block-el { display: inline-block; width: 100px; background: #ccc; }
+
+    /* --- 溢出与隐藏 --- */
+    .overflow-box {
+      width: 150px;
+      white-space: nowrap;      /* 不换行 */
+      overflow: hidden;         /* 溢出隐藏 */
+      text-overflow: ellipsis;  /* 省略号 */
+      border: 1px dashed green;
+    }
+
+    .hide-none { display: none; }         /* 不占位 */
+    .hide-vis  { visibility: hidden; }   /* 占位 */
+    .hide-op   { opacity: 0; }           /* 占位且可交互 */
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1 style="color: var(--primary-green);">1.3 CSS 基础复习</h1> <!-- 【引入方式 1: 行内样式】优先级极高 -->
+  </header>
+
+  <section id="selectors">
+    <h2>1. 选择器与优先级</h2>
+    <div id="id-selector" class="priority-test" style="color: red !important;">
+      优先级演示：!important 最终胜出
+    </div>
+    <p>权重计算公式：<code>(0, 0, 0, 0) -> (important, ID, Class/Attribute/Pseudo, Tag)</code></p>
+  </section>
+
+  <section id="box-model">
+    <h2>2. 盒模型 (Box Model)</h2>
+    
+    <div class="grid" style="display: flex; gap: 20px;">
+      <div class="standard-box">标准盒模型<br>(总宽 260px)</div>
+      <div class="border-box">IE/Border-box<br>(总宽 200px)</div>
+    </div>
+    <p><small>* 标准盒模型下，padding 和 border 会把盒子撑大。</small></p>
+  </section>
+
+  <section id="display">
+    <h2>3. 元素类型与 Display</h2>
+    <div class="block-el">块级元素：独占一行，支持宽高</div>
+    <span class="inline-el">行内元素：并排显示，不支持宽高，上下margin失效</span>
+    <div class="inline-block-el">行内块：并排且支持宽高</div>
+  </section>
+
+  <section id="text-style">
+    <h2>4. 文本样式与溢出处理</h2>
+    <p style="text-indent: 2em; text-decoration: underline;">这是一个带有缩进和下划线的段落。</p>
+    <div class="overflow-box">
+      这是一个非常长的句子，测试单行省略号效果。
+    </div>
+  </section>
+
+  <section id="hide">
+    <h2>5. 元素隐藏方案</h2>
+    <div style="background: #f1f1f1; padding: 10px;">
+      <span>[A]</span>
+      <span class="hide-none">Hidden (none)</span>
+      <span>[B]</span>
+      <span class="hide-vis">Hidden (visibility)</span>
+      <span>[C]</span>
+    </div>
+    <ul style="font-size: 12px; margin-top:10px;">
+      <li><code>display: none</code>: 脱离文档流，不占空间，触发重排。</li>
+      <li><code>visibility: hidden</code>: 占位，不触发重排，子元素可设 visible 显示。</li>
+      <li><code>opacity: 0</code>: 占位，可响应点击事件。</li>
+    </ul>
+  </section>
+
+</body>
+</html>

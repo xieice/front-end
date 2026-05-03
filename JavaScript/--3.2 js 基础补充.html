@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3.2 JavaScript 基础补充</title>
+  <style>
+    :root {
+      --primary: #42b983;
+      --bg: #f4f8f6;
+      --card: #ffffff;
+      --code-bg: #2d3436;
+      --text: #2c3e50;
+      --border: #e0e6e3;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', system-ui; background: var(--bg); color: var(--text); padding: 2rem; line-height: 1.6; }
+    h1 { text-align: center; color: var(--primary); margin-bottom: 2rem; }
+    h2 { border-left: 5px solid var(--primary); padding-left: 15px; margin: 2rem 0 1rem; color: #35495e; font-size: 1.4rem; }
+    h3 { color: var(--primary); font-size: 1.1rem; margin: 1rem 0 0.5rem; }
+    
+    .card { background: var(--card); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+    
+    pre { background: var(--code-bg); color: #a9b7c6; padding: 1rem; border-radius: 8px; overflow-x: auto; font-family: 'Consolas', monospace; font-size: 0.95rem; margin: 10px 0; }
+    .kw { color: #cc7832; font-weight: bold; } /* Keyword */
+    .str { color: #6a8759; } /* String */
+    .fn { color: #ffc66d; } /* Function */
+    .num { color: #6897bb; } /* Number */
+    .cmt { color: #808080; font-style: italic; } /* Comment */
+
+    table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 0.95rem; }
+    th, td { border: 1px solid var(--border); padding: 10px; text-align: left; }
+    th { background-color: #eaf4ef; color: var(--text); }
+  </style>
+</head>
+<body>
+
+  <h1>JS 基础精读：遗漏考点补全</h1>
+
+  <!-- 1. 运算符进阶 -->
+  <section class="card">
+    <h2>1. 运算符：你可能忽略的黑魔法</h2>
+    
+    <h3>逻辑与高级运算符 (ES6+)</h3>
+<pre><span class="cmt">// 1. 逻辑空赋值 (??=) 和 空值合并 (??)</span>
+<span class="cmt">// 与 || 不同，?? 只在左侧为 null 或 undefined 时才返回右侧（0 和 "" 会被保留）</span>
+<span class="kw">let</span> count = <span class="num">0</span>;
+<span class="kw">let</span> a = count || <span class="num">10</span>; <span class="cmt">// a = 10 (0 被当成 false 误判了)</span>
+<span class="kw">let</span> b = count ?? <span class="num">10</span>; <span class="cmt">// b = 0  (正确保留了 0)</span>
+
+<span class="cmt">// 2. 可选链 (Optional Chaining ?.)</span>
+<span class="kw">const</span> user = {};
+<span class="fn">console.log</span>(user.address?.city); <span class="cmt">// undefined，不会抛出 Cannot read property 错误</span></pre>
+
+    <h3>位运算 (Bitwise) 面试骚操作</h3>
+    <p>位运算直接操作二进制，速度极快，常用于算法或极客写法。</p>
+<pre><span class="cmt">// 1. 双波浪号 (~~) 代替 Math.floor() 对于正数</span>
+<span class="fn">console.log</span>(~~<span class="num">3.14159</span>); <span class="cmt">// 3</span>
+
+<span class="cmt">// 2. 按位异或 (^) 交换变量（不借助第三个变量）</span>
+<span class="kw">let</span> x = <span class="num">1</span>, y = <span class="num">2</span>;
+x = x ^ y; y = x ^ y; x = x ^ y; <span class="cmt">// 现在 x=2, y=1</span></pre>
+  </section>
+
+  <!-- 2. 中断与控制流 -->
+  <section class="card">
+    <h2>2. 流程中断：break vs continue vs return</h2>
+    <table>
+      <tr>
+        <th>关键字</th>
+        <th>作用域</th>
+        <th>核心行为</th>
+      </tr>
+      <tr>
+        <td><strong>break</strong></td>
+        <td>循环 (for/while)、switch</td>
+        <td><strong>彻底砸碎当前循环</strong>，跳出整个循环体，执行循环外的后续代码。</td>
+      </tr>
+      <tr>
+        <td><strong>continue</strong></td>
+        <td>仅循环 (for/while)</td>
+        <td><strong>仅跳过当前这一圈</strong>，直接进入下一次循环迭代。</td>
+      </tr>
+      <tr>
+        <td><strong>return</strong></td>
+        <td>仅函数体内</td>
+        <td><strong>终止整个函数的执行</strong>，并可携带一个返回值给调用者。如果在循环里 return，不仅循环没了，函数也结束了。</td>
+      </tr>
+    </table>
+  </section>
+
+  <!-- 3. 函数参数 -->
+  <section class="card">
+    <h2>3. 函数参数：arguments vs ...rest</h2>
+    <p>过去我们用 <code>arguments</code> 收集未知数量的参数，但它有很多坑。现在推荐用剩余参数 <code>...args</code>。</p>
+<pre><span class="kw">function</span> <span class="fn">oldWay</span>() {
+  <span class="fn">console.log</span>(<span class="kw">typeof</span> arguments); <span class="cmt">// 'object' (类数组，不是真数组！)</span>
+  <span class="cmt">// 必须借助 Array.from() 或 [].slice.call(arguments) 才能用 map/filter</span>
+}
+
+<span class="kw">function</span> <span class="fn">newWay</span>(first, ...rest) {
+  <span class="cmt">// rest 是一个真正的数组，直接可以使用数组的高阶方法</span>
+  <span class="kw">return</span> rest.<span class="fn">map</span>(i => i * <span class="num">2</span>);
+}
+
+<span class="cmt">// 默认参数 (Default Parameters) 的求值惰性：</span>
+<span class="kw">function</span> <span class="fn">test</span>(a = <span class="fn">getDef()</span>) {} <span class="cmt">// 只有当不传 a 时，才会执行 getDef() 函数</span></pre>
+  </section>
+
+  <!-- 4. 继承演进史 -->
+  <section class="card">
+    <h2>4. 继承方案演进史 (高频面试重灾区)</h2>
+    
+    <p><strong>1. 原型链继承：</strong> <code>Child.prototype = new Parent()</code><br>
+    <small>缺点：所有子类实例共享父类原型上的引用类型属性（一个改了，全变了），且无法向父类传参。</small></p>
+
+    <p><strong>2. 构造函数继承：</strong> <code>function Child() { Parent.call(this) }</code><br>
+    <small>缺点：只继承了实例属性，没继承原型链上的方法（方法都在构造函数里，无法复用）。</small></p>
+
+    <p><strong>3. 组合继承：</strong> <small>（原型链 + 构造函数）</small><br>
+    <small>缺点：父类构造函数被调用了两次，导致子类实例和原型上存在两份同名属性，浪费内存。</small></p>
+
+    <h3>4. 完美方案：寄生组合式继承 (ES5 终极答案)</h3>
+<pre><span class="kw">function</span> <span class="fn">Parent</span>(name) { <span class="kw">this</span>.name = name; }
+Parent.prototype.say = <span class="kw">function</span>() { <span class="fn">console.log</span>(<span class="kw">this</span>.name); };
+
+<span class="kw">function</span> <span class="fn">Child</span>(name, age) {
+  Parent.<span class="fn">call</span>(<span class="kw">this</span>, name); <span class="cmt">// 1. 借用构造函数继承实例属性</span>
+  <span class="kw">this</span>.age = age;
+}
+
+<span class="cmt">// 2. 创建父类原型的一个副本，避免二次调用父类构造函数</span>
+Child.prototype = Object.<span class="fn">create</span>(Parent.prototype);
+<span class="cmt">// 3. 修复 constructor 指向</span>
+Child.prototype.constructor = Child;</pre>
+
+    <h3>5. ES6 class extends (语法糖)</h3>
+    <p>ES6 的继承本质上就是<strong>寄生组合式继承</strong>的语法糖，但有一个核心区别：</p>
+    <ul>
+      <li><strong>ES5</strong> 是先创造子类的实例对象 <code>this</code>，然后再将父类的方法添加到 <code>this</code> 上（<code>Parent.call(this)</code>）。</li>
+      <li><strong>ES6</strong> 是先将父类实例对象的属性和方法加到 <code>this</code> 上（所以必须先调用 <code>super()</code>），然后再用子类的构造函数修改 <code>this</code>。</li>
+    </ul>
+  </section>
+
+</body>
+</html>

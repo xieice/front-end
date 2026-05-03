@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2.3 CSS 动画</title>
+  <!-- Lottie 运行时库 (CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+  
+  <style>
+    :root {
+      --primary: #42b983;
+      --bg: #f0f7f4;
+      --card: #ffffff;
+      --text: #2c3e50;
+      --bezier: cubic-bezier(0.68, -0.55, 0.27, 1.55); /* 经典弹性贝塞尔 */
+    }
+
+    body { font-family: system-ui; background: var(--bg); color: var(--text); padding: 2rem; line-height: 1.6; }
+    h1 { text-align: center; color: var(--primary); margin-bottom: 2rem; }
+    .card { background: var(--card); border-radius: 12px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+    h2 { border-left: 5px solid var(--primary); padding-left: 15px; margin-bottom: 1.5rem; }
+    
+    .demo-box {
+      width: 80px; height: 80px; background: var(--primary); border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; color: white;
+      font-size: 12px; cursor: pointer; transition: all 0.3s ease;
+    }
+
+    /* --------------------------------------------------
+       1. 过渡 (Transition)
+    -------------------------------------------------- */
+    .trans-demo:hover {
+      width: 200px;
+      background: #35495e;
+      border-radius: 40px;
+      /* 重点：all 是性能杀手，建议明确指定属性 */
+      transition: width 0.5s var(--bezier), background 0.3s linear;
+    }
+
+    /* --------------------------------------------------
+       2. 变换 (Transform 2D)
+    -------------------------------------------------- */
+    .tf-demo:hover {
+      transform: translate(20px, -10px) rotate(15deg) scale(1.2) skewX(-10deg);
+    }
+
+    /* --------------------------------------------------
+       3. 3D 变换 (Transform 3D)
+    -------------------------------------------------- */
+    .scene-3d {
+      perspective: 800px; /* 【关键】透视距离，决定 3D 深度感 */
+      display: inline-block;
+    }
+    .cube {
+      width: 100px; height: 100px;
+      position: relative;
+      transform-style: preserve-3d; /* 【关键】保留子元素 3D 空间 */
+      transition: transform 1s;
+    }
+    .cube:hover {
+      transform: rotateY(180deg) rotateX(45deg);
+    }
+    .face {
+      position: absolute; width: 100px; height: 100px; line-height: 100px; text-align: center;
+      background: rgba(66, 185, 131, 0.8); border: 1px solid white;
+      backface-visibility: visible; /* 决定背面是否可见 */
+    }
+    .face.back { transform: translateZ(-50px) rotateY(180deg); background: #35495e; }
+    .face.front { transform: translateZ(50px); }
+
+    /* --------------------------------------------------
+       4. 关键帧动画 (@keyframes)
+    -------------------------------------------------- */
+    @keyframes pulse-ring {
+      0% { transform: scale(0.8); opacity: 0.5; }
+      50% { transform: scale(1.2); opacity: 0.8; }
+      100% { transform: scale(0.8); opacity: 0.5; }
+    }
+
+    .anim-demo {
+      /* animation: name duration timing-function delay iteration-count direction fill-mode */
+      animation: pulse-ring 2s infinite ease-in-out;
+      /* animation-fill-mode: forwards; 动画结束后停在最后一帧 */
+    }
+
+    /* --------------------------------------------------
+       5. 逐帧动画 (Steps)
+    -------------------------------------------------- */
+    .steps-demo {
+      width: 100px; height: 100px;
+      background: url('https://via.placeholder.com/400x100/42b983/ffffff?text=1234') left center;
+      animation: play-sprite 2s steps(4) infinite; /* 关键：steps 分步执行 */
+    }
+    @keyframes play-sprite {
+      from { background-position: 0; }
+      to { background-position: -400px; }
+    }
+
+    /* --------------------------------------------------
+       6. 性能优化 (will-change)
+    -------------------------------------------------- */
+    .optimize-demo {
+      will-change: transform, opacity; /* 提前通知浏览器开启 GPU 加速层 */
+    }
+
+    /* --------------------------------------------------
+       7. Lottie 容器
+    -------------------------------------------------- */
+    #lottie-container {
+      width: 150px; height: 150px; margin: 0 auto;
+    }
+
+  </style>
+</head>
+<body>
+
+  <h1>CSS 动画深度复习手册</h1>
+
+  <!-- 过渡与变换 -->
+  <div class="grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+    
+    <section class="card">
+      <h2>1. 过渡与 2D 变换</h2>
+      <p>Hover 下方方块观察 <code>transition</code> 与 <code>transform</code>：</p>
+      <div class="demo-box trans-demo">Transition</div>
+      <br>
+      <div class="demo-box tf-demo" style="background:#e67e22">Transform</div>
+    </section>
+
+    <!-- 3D 变换 -->
+    <section class="card">
+      <h2>2. 3D 空间 (3D Space)</h2>
+      <div class="scene-3d">
+        <div class="cube">
+          <div class="face front">Front</div>
+          <div class="face back">Back</div>
+        </div>
+      </div>
+      <p style="margin-top:20px;"><small>使用 <code>perspective</code> 和 <code>preserve-3d</code> 构建。</small></p>
+    </section>
+
+    <!-- 关键帧动画 -->
+    <section class="card">
+      <h2>3. 关键帧与逐帧动画</h2>
+      <div style="display:flex; gap: 40px; align-items:center;">
+        <div>
+          <p>补间动画：</p>
+          <div class="demo-box anim-demo">Pulse</div>
+        </div>
+        <div>
+          <p>逐帧 (Steps)：</p>
+          <div class="steps-demo"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 性能与高级方案 -->
+    <section class="card">
+      <h2>4. 性能优化与 Lottie</h2>
+      <p>性能三法则：优先使用 <strong>Transform</strong> 和 <strong>Opacity</strong>，避免触发布局抖动。</p>
+      <div id="lottie-container"></div>
+      <p style="text-align:center"><small>Lottie 方案：设计稿导出 JSON，跨端一致。</small></p>
+    </section>
+
+  </div>
+
+  <section class="card" style="margin-top: 2rem; background: #2c3e50; color: #fff;">
+    <h2>💡 面试核心：动画性能优化 (Critical)</h2>
+    <ul>
+      <li><strong>渲染流水线：</strong> 动画触发 <code>Layout</code> (如 width) > <code>Paint</code> (如 color) > <code>Composite</code> (层合成)。</li>
+      <li><strong>GPU 加速：</strong> 使用 <code>transform</code> (translate3d/scale/rotate) 和 <code>opacity</code> 仅触发 <code>Composite</code>，由 GPU 完成，不占主线程。</li>
+      <li><strong>will-change：</strong> 慎用！仅对已知要频繁变化的元素使用，长期占用 GPU 内存会导致页面卡顿。</li>
+      <li><strong>requestAnimationFrame：</strong> 如果用 JS 写动画，务必放弃 <code>setInterval</code>，使用 <code>rAF</code> 对齐屏幕刷新率 (60fps)。</li>
+    </ul>
+  </section>
+
+  <script>
+    // 初始化 Lottie 动画 (加载一个官方示例)
+    lottie.loadAnimation({
+      container: document.getElementById('lottie-container'),
+      renderer: 'svg',
+      loop: true,
+      autoplay: true,
+      path: 'https://assets5.lottiefiles.com/datafiles/zc3XRzWUXam2zG9/data.json' // 示例 JSON 地址
+    });
+  </script>
+
+</body>
+</html>

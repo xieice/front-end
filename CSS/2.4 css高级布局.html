@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2.4 高级布局方案</title>
+  <style>
+    :root {
+      --green-primary: #42b983;
+      --green-bg: #f8faf9;
+      --border-color: #e0e6e3;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: var(--green-bg); color: #333; line-height: 1.6; padding: 2rem; }
+    
+    h1 { text-align: center; color: var(--green-primary); margin-bottom: 2rem; }
+    h2 { border-left: 5px solid var(--green-primary); padding-left: 15px; margin: 2rem 0 1rem; font-size: 1.5rem; }
+    
+    .card { background: #fff; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 12px rgba(0,0,0,0.05); }
+    code { background: #f1f1f1; padding: 2px 6px; border-radius: 4px; font-family: Consolas, monospace; font-size: 0.9em; }
+
+    /* --------------------------------------------------
+       1. 格式化上下文 (BFC/IFC/FFC/GFC)
+    -------------------------------------------------- */
+    .bfc-container {
+      background: #eee;
+      overflow: hidden; /* 【关键】触发 BFC */
+      margin: 20px 0;
+      padding: 10px;
+    }
+    .float-box {
+      float: left;
+      width: 100px; height: 50px;
+      background: var(--green-primary);
+      margin: 10px;
+    }
+
+    /* --------------------------------------------------
+       2. CSS Subgrid (网格继承)
+    -------------------------------------------------- */
+    .grid-parent {
+      display: grid;
+      grid-template-columns: 100px 1fr 100px;
+      gap: 10px;
+      background: #eef2f0;
+      padding: 10px;
+    }
+    .grid-child-item {
+      grid-column: span 3;
+      display: grid;
+      grid-template-columns: subgrid; /* 【核心】继承父级网格线 */
+      background: #fff;
+      border: 1px dashed var(--green-primary);
+    }
+
+    /* --------------------------------------------------
+       3. 瀑布流布局 (Waterfall/Masonry)
+    -------------------------------------------------- */
+    /* 方案 A: 多列布局实现 */
+    .waterfall-columns {
+      column-count: 3;
+      column-gap: 15px;
+    }
+    .waterfall-item {
+      break-inside: avoid; /* 防止内容被截断跨列 */
+      background: var(--green-primary);
+      margin-bottom: 15px;
+      border-radius: 8px;
+      color: white;
+      display: flex;
+      align-items: center; justify-content: center;
+    }
+
+    /* --------------------------------------------------
+       4. 1px 边框解决方案
+    -------------------------------------------------- */
+    .border-1px {
+      position: relative;
+      width: 100%; height: 50px;
+      background: #fff;
+    }
+    .border-1px::after {
+      content: "";
+      position: absolute;
+      top: 0; left: 0;
+      width: 200%; height: 200%; /* 放大两倍 */
+      border: 1px solid #333;
+      transform: scale(0.5); /* 缩回原位 */
+      transform-origin: 0 0;
+      pointer-events: none;
+    }
+
+    /* --------------------------------------------------
+       5. 容器查询 (Container Queries)
+    -------------------------------------------------- */
+    .container-wrapper {
+      container-type: inline-size; /* 【核心】定义容器类型 */
+      resize: horizontal;
+      overflow: auto;
+      border: 2px solid #ccc;
+      padding: 10px;
+    }
+
+    @container (min-width: 400px) {
+      .container-content {
+        background: var(--green-primary);
+        color: white;
+        padding: 20px;
+      }
+      .container-content::before { content: "宽容器模式："; }
+    }
+
+  </style>
+</head>
+<body>
+
+  <h1>高级布局方案复习指南</h1>
+
+  <!-- 1. 格式化上下文 -->
+  <section class="card">
+    <h2>1. 格式化上下文 (Formatting Contexts)</h2>
+    <p><strong>BFC (Block Formatting Context)</strong> 是一个独立的渲染区域，内部子元素不会影响外部布局。</p>
+    <ul>
+      <li><strong>触发方式：</strong> <code>overflow</code> 不为 visible、<code>float</code> 不为 none、<code>display</code> 为 inline-block/flex/grid、<code>position</code> 为 absolute/fixed。</li>
+      <li><strong>解决问题：</strong> 1. 清除浮动带来的父元素高度塌陷；2. 阻止外边距 (margin) 重叠；3. 制作自适应两栏布局。</li>
+    </ul>
+    
+    <div class="bfc-container">
+      <div class="float-box">浮动元素</div>
+      <p>我是 BFC 容器内的文字，我不会被浮动元素覆盖，因为 BFC 区域不会与 float box 重叠。</p>
+    </div>
+  </section>
+
+  <!-- 2. Subgrid 与 多列布局 -->
+  <section class="card">
+    <h2>2. CSS Subgrid & Multi-column</h2>
+    <p><strong>Subgrid：</strong> 允许嵌套的网格项目直接使用父网格定义的行和列，实现完美的跨组件对齐。</p>
+    
+    <div class="grid-parent">
+      <div style="background: #ccc;">L</div>
+      <div style="background: #ddd;">Center</div>
+      <div style="background: #ccc;">R</div>
+      <div class="grid-child-item">
+        <span>Sub-L</span>
+        <span style="text-align: center;">Sub-Center</span>
+        <span style="text-align: right;">Sub-R</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. 瀑布流 -->
+  <section class="card">
+    <h2>3. 瀑布流布局 (Waterfall)</h2>
+    <p>瀑布流通常用于图片展示。纯 CSS 可以用 <code>column-count</code> 快速实现，但顺序是纵向的。</p>
+    
+    <div class="waterfall-columns">
+      <div class="waterfall-item" style="height: 100px;">1</div>
+      <div class="waterfall-item" style="height: 150px;">2</div>
+      <div class="waterfall-item" style="height: 80px;">3</div>
+      <div class="waterfall-item" style="height: 120px;">4</div>
+      <div class="waterfall-item" style="height: 180px;">5</div>
+      <div class="waterfall-item" style="height: 90px;">6</div>
+    </div>
+  </section>
+
+  <!-- 4. 移动端适配 -->
+  <section class="card">
+    <h2>4. 移动端适配方案</h2>
+    <p><strong>Viewport:</strong> 通过 <code>&lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;</code> 解决缩放问题。</p>
+    <p><strong>Rem 适配 (过时但需了解):</strong> <code>lib-flexible</code> 动态修改 html 的 font-size。</p>
+    <p><strong>现代方案 (推荐):</strong> 直接使用 <code>vw/vh</code> 配合 <code>calc()</code>。</p>
+    
+    <h4>1px 边框问题：</h4>
+    <p>在高分屏（Retina）上，CSS 的 1px 对应物理像素可能是 2px 或 3px，看起来很粗。</p>
+    <div class="border-1px">Scale 缩放法实现的 1px 边框</div>
+  </section>
+
+  <!-- 5. 容器查询 -->
+  <section class="card">
+    <h2>5. CSS 容器查询 (@container)</h2>
+    <p><strong>打破媒体查询的局限性：</strong> 媒体查询监听的是浏览器视口宽度，而容器查询监听的是<strong>父元素</strong>的宽度。这使得组件在不同侧边栏或主栏中能自适应样式。</p>
+    
+    <div class="container-wrapper">
+      <p><small>← 拖动右下角缩放此容器，观察内部颜色变化 →</small></p>
+      <div class="container-content">内容随容器宽度改变</div>
+    </div>
+  </section>
+
+</body>
+</html>

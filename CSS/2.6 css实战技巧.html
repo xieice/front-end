@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2.6 CSS 实战技巧</title>
+  <style>
+    :root {
+      --primary-green: #42b983;
+      --bg-color: #f4f7f5;
+      --card-bg: #ffffff;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; background: var(--bg-color); color: #2c3e50; padding: 2rem; line-height: 1.6; }
+    h1 { text-align: center; color: var(--primary-green); margin-bottom: 2rem; }
+    h2 { border-left: 5px solid var(--primary-green); padding-left: 15px; margin: 2rem 0 1rem; font-size: 1.3rem; }
+    .card { background: var(--card-bg); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    
+    /* --------------------------------------------------
+       1. 水平垂直居中（多种方案）
+    -------------------------------------------------- */
+    .center-parent { height: 150px; background: #eee; position: relative; border-radius: 8px; margin-bottom: 10px; }
+    .center-child { width: 60px; height: 60px; background: var(--primary-green); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; text-align: center; border-radius: 4px; }
+
+    .flex-center { display: flex; justify-content: center; align-items: center; }
+    .grid-center { display: grid; place-items: center; }
+    .abs-transform { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+    .abs-margin { position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto; }
+
+    /* --------------------------------------------------
+       2. 三角形、箭头、对话框
+    -------------------------------------------------- */
+    .triangle {
+      width: 0; height: 0;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-bottom: 30px solid var(--primary-green);
+    }
+    
+    .bubble {
+      position: relative; width: 150px; padding: 10px; background: var(--primary-green); color: white; border-radius: 8px;
+    }
+    .bubble::after {
+      content: ""; position: absolute; left: 20px; bottom: -15px;
+      border-top: 15px solid var(--primary-green);
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+    }
+
+    /* --------------------------------------------------
+       3. 文本省略号
+    -------------------------------------------------- */
+    .single-line {
+      width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border: 1px dashed #ccc;
+    }
+    .multi-line {
+      width: 200px; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; /* 行数 */
+      overflow: hidden; border: 1px dashed #ccc; margin-top: 10px;
+    }
+
+    /* --------------------------------------------------
+       4. 清除浮动 (Clearfix)
+    -------------------------------------------------- */
+    .clearfix::after {
+      content: ""; display: block; clear: both;
+    }
+
+    /* --------------------------------------------------
+       5. 头像与边框
+    -------------------------------------------------- */
+    .avatar {
+      width: 80px; height: 80px; border-radius: 50%;
+      border: 3px solid var(--primary-green);
+      object-fit: cover; /* 保证不变形 */
+    }
+
+    /* --------------------------------------------------
+       6. CSS Houdini (模拟效果)
+    -------------------------------------------------- */
+    .houdini-box {
+      width: 100%; height: 60px;
+      background: paint(my-awesome-background); /* 需要浏览器支持且有相关 JS Worklet */
+      background-color: #ddd; text-align: center; line-height: 60px; border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>CSS 实战技巧实验室</h1>
+
+  <!-- 居中方案 -->
+  <section class="card">
+    <h2>1. 居中方案 (Centering)</h2>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+      <div><p>Flex 方案</p><div class="center-parent flex-center"><div class="center-child">Flex</div></div></div>
+      <div><p>Grid 方案</p><div class="center-parent grid-center"><div class="center-child">Grid</div></div></div>
+      <div><p>Transform 方案</p><div class="center-parent"><div class="center-child abs-transform">Fixed Size</div></div></div>
+      <div><p>Margin Auto 方案</p><div class="center-parent"><div class="center-child abs-margin">Auto</div></div></div>
+    </div>
+  </section>
+
+  <!-- 形状方案 -->
+  <section class="card">
+    <h2>2. 形状与组件 (Shapes & UI)</h2>
+    <div style="display: flex; gap: 40px; align-items: center;">
+      <div><p>纯 CSS 三角</p><div class="triangle"></div></div>
+      <div><p>对话框气泡</p><div class="bubble">Hello! 这是一条气泡消息。</div></div>
+      <div><p>圆形头像</p><img class="avatar" src="https://via.placeholder.com/100" alt="Avatar"></div>
+    </div>
+  </section>
+
+  <!-- 文本处理 -->
+  <section class="card">
+    <h2>3. 文本溢出处理 (Ellipsis)</h2>
+    <p>单行省略：</p>
+    <div class="single-line">这是一段非常非常长的文字，将会被截断。</div>
+    <p style="margin-top:10px;">多行省略 (两行)：</p>
+    <div class="multi-line">这里是一段长文本。多行省略通常用于移动端的新闻列表、商品标题展示等场景。</div>
+  </section>
+
+  <!-- 性能与进阶 -->
+  <section class="card">
+    <h2>4. 渲染性能与魔法 (Performance & Houdini)</h2>
+    <div style="background: #f9f9f9; padding: 10px; border-radius: 8px;">
+      <p><strong>重绘 (Repaint):</strong> 改变外观（颜色、阴影），不影响布局。</p>
+      <p><strong>回流 (Reflow):</strong> 改变几何结构（宽高、位置），代价昂贵，会触发重新计算布局。</p>
+      <br>
+      <p><strong>CSS Houdini:</strong> CSS 引擎的低级 API，允许开发者通过 JS 直接接入浏览器的渲染流程（如自定义 Paint、Layout）。</p>
+      <div class="houdini-box">Houdini Paint Area</div>
+    </div>
+  </section>
+
+  <!-- 滚动穿透控制 -->
+  <section class="card">
+    <h2>5. 滚动穿透问题 (Scroll Penetration)</h2>
+    <p>当弹窗打开时，背景页面依然可以滚动。解决方法：</p>
+    <div style="background: #eef; padding: 10px; border-radius: 6px; font-family: monospace; font-size: 0.9rem;">
+      /* 弹窗打开时给 body 加上 */<br>
+      body.modal-open {<br>
+        overflow: hidden;<br>
+        height: 100vh;<br>
+      }
+    </div>
+  </section>
+
+</body>
+</html>

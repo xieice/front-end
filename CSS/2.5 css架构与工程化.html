@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2.5 CSS 架构与工程化</title>
+  <style>
+    :root {
+      --green-primary: #42b983;
+      --green-dark: #35495e;
+      --bg-light: #f4f8f6;
+      --code-bg: #2d3436;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', system-ui; background: var(--bg-light); color: #2c3e50; line-height: 1.7; padding: 2rem; }
+    
+    h1 { text-align: center; color: var(--green-primary); margin-bottom: 2rem; }
+    h2 { border-left: 6px solid var(--green-primary); padding-left: 15px; margin: 2rem 0 1rem; font-size: 1.5rem; color: var(--green-dark); }
+    
+    .card { background: #fff; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #eef2f0; }
+    
+    .code-block { background: var(--code-bg); color: #dfe6e9; padding: 1.2rem; border-radius: 8px; font-family: 'Fira Code', monospace; font-size: 0.9rem; margin: 10px 0; overflow-x: auto; white-space: pre; }
+    .comment { color: #636e72; }
+    .keyword { color: #74b9ff; }
+    .string { color: #55efc4; }
+
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; background: var(--green-primary); color: white; margin-right: 5px; }
+    
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; }
+    ul { padding-left: 1.5rem; }
+    li { margin-bottom: 0.5rem; }
+  </style>
+</head>
+<body>
+
+  <h1>CSS 工程化全景观</h1>
+
+  <!-- 1. 预处理器 -->
+  <section class="card">
+    <h2>1. CSS 预处理器 (Preprocessors)</h2>
+    <p>解决 CSS 无法嵌套、变量支持差、难以维护的问题。目前 <strong>Sass/SCSS</strong> 是行业标准。</p>
+    <div class="code-block">
+<span class="comment">// SCSS 演示</span>
+<span class="keyword">$primary</span>: #42b983;
+
+<span class="keyword">@mixin</span> flex-center {
+  display: flex; justify-content: center; align-items: center;
+}
+
+<span class="keyword">.container</span> {
+  <span class="keyword">@include</span> flex-center;
+  <span class="keyword">.item</span> {
+    color: <span class="keyword">$primary</span>;
+    <span class="keyword">&:hover</span> { opacity: 0.8; }
+  }
+}</div>
+    <p><strong>PostCSS：</strong> 严格来说它不是预处理器，而是一个插件转换平台（类似 CSS 的 Babel）。常用插件：<code>Autoprefixer</code>（自动补全前缀）、<code>postcss-preset-env</code>（使用未来特性）。</p>
+  </section>
+
+  <!-- 2. 命名规范与思想 -->
+  <section class="card">
+    <h2>2. 命名规范与架构思想 (BEM / OOCSS / SMACSS)</h2>
+    <div class="grid">
+      <div>
+        <h4>BEM (Block Element Modifier)</h4>
+        <p>解决命名冲突和权重问题。结构清晰，但类名可能较长。</p>
+        <div class="code-block">.card { } <span class="comment">// Block</span>
+.card__title { } <span class="comment">// Element (双下划线)</span>
+.card--featured { } <span class="comment">// Modifier (双连字符)</span></div>
+      </div>
+      <div>
+        <h4>OOCSS & SMACSS</h4>
+        <ul>
+          <li><strong>OOCSS:</strong> 面向对象 CSS。分离结构（width, margin）与皮肤（color, shadow）。</li>
+          <li><strong>SMACSS:</strong> 将样式分为五类：Base, Layout, Module, State, Theme。</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. CSS 隔离方案 -->
+  <section class="card">
+    <h2>3. 作用域隔离 (CSS Modules & CSS-in-JS)</h2>
+    <p>主要用于 React/Vue 组件开发，防止全局污染。</p>
+    <ul>
+      <li><strong>CSS Modules:</strong> 通过构建工具将类名哈希化，生成唯一的标识符。</li>
+      <li><strong>CSS-in-JS (Styled-components):</strong> 在 JS 中写 CSS，支持动态逻辑。</li>
+    </ul>
+    <div class="code-block">
+<span class="comment">// Styled-components 演示</span>
+<span class="keyword">const</span> Button = styled.button`
+  background: ${props => props.primary ? 'green' : 'gray'};
+  border-radius: 4px;
+`;</div>
+  </section>
+
+  <!-- 4. 原子化 CSS -->
+  <section class="card">
+    <h2>4. 现代原子化 (Tailwind CSS & UnoCSS)</h2>
+    <p><strong>实用主义极致：</strong> 不再起名字，直接在 HTML 中使用预设的类。配合 JIT（即时编译）引擎。</p>
+    <div class="code-block">
+&lt;div class="<span class="string">flex p-4 m-2 bg-green-500 rounded-lg shadow-xl hover:scale-105 transition</span>"&gt;
+  Hello Tailwind!
+&lt;/div&gt;</div>
+    <p><strong>UnoCSS:</strong> 极致的原子化引擎，比 Tailwind 更快、更灵活，支持按需生成的正则表达式规则。</p>
+  </section>
+
+  <!-- 5. 设计令牌 -->
+  <section class="card" style="border-top: 5px solid var(--green-dark);">
+    <h2>5. 设计令牌 (Design Tokens)</h2>
+    <p>它是 UI 系统的“最小原子数据”。将颜色、间距、字体等抽象为与平台无关的变量（通常是 JSON）。</p>
+    <div class="grid">
+      <div class="code-block">
+{
+  "color": {
+    "brand": { "value": "#42b983" },
+    "error": { "value": "#ff4757" }
+  },
+  "spacing": { "medium": { "value": "16px" } }
+}</div>
+      <div>
+        <p><strong>意义：</strong> 保证 Web、iOS、Android 端样式的一致性。当设计师修改品牌色时，只需修改 JSON，所有端的 CSS 变量会自动更新。</p>
+      </div>
+    </div>
+  </section>
+
+</body>
+</html>

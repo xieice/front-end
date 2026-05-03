@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3.1 JavaScript 基础</title>
+  <style>
+    :root {
+      --primary: #42b983;
+      --bg: #f4f8f6;
+      --card-bg: #ffffff;
+      --code-bg: #2d3436;
+      --text: #2c3e50;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); padding: 2rem; line-height: 1.6; }
+    h1 { text-align: center; color: var(--primary); margin-bottom: 2rem; }
+    h2 { border-left: 5px solid var(--primary); padding-left: 15px; margin: 2rem 0 1rem; color: #35495e; }
+    h3 { margin: 1rem 0 0.5rem; color: var(--primary); font-size: 1.1rem; }
+    
+    .card { background: var(--card-bg); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    
+    pre { background: var(--code-bg); color: #a9b7c6; padding: 1rem; border-radius: 8px; overflow-x: auto; font-family: 'Consolas', monospace; font-size: 0.95rem; margin: 10px 0; }
+    .kw { color: #cc7832; font-weight: bold; } /* Keyword */
+    .str { color: #6a8759; } /* String */
+    .fn { color: #ffc66d; } /* Function */
+    .num { color: #6897bb; } /* Number */
+    .cmt { color: #808080; font-style: italic; } /* Comment */
+
+    table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+    th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
+    th { background-color: var(--primary); color: white; }
+    
+    .highlight { background: rgba(66, 185, 131, 0.1); padding: 2px 6px; border-radius: 4px; color: var(--primary); font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <h1>JavaScript 核心基础全景图</h1>
+
+  <!-- 1. 变量与数据类型 -->
+  <section class="card">
+    <h2>1. 变量声明与数据类型</h2>
+    <div class="grid-2">
+      <div>
+        <h3>变量声明 (var / let / const)</h3>
+        <ul>
+          <li><strong>var:</strong> 函数作用域，存在变量提升（Hoisting），允许重复声明。</li>
+          <li><strong>let:</strong> 块级作用域，存在<span class="highlight">暂时性死区 (TDZ)</span>，不能在声明前使用，不允许重复声明。</li>
+          <li><strong>const:</strong> 块级作用域，声明时必须赋值，绑定后<strong>引用地址不可变</strong>（但若是对象，其内部属性可变）。</li>
+        </ul>
+      </div>
+      <div>
+        <h3>八大数据类型</h3>
+        <p><strong>基本类型 (栈内存):</strong> Number, String, Boolean, Undefined, Null, Symbol (唯一值), BigInt (大整数, 尾部加n)。</p>
+        <p><strong>引用类型 (堆内存):</strong> Object (包含 Array, Function, Date 等)。</p>
+      </div>
+    </div>
+    
+    <h3>typeof 与 类型转换避坑</h3>
+<pre><span class="cmt">// typeof 的著名 Bug</span>
+<span class="kw">typeof</span> <span class="kw">null</span> === <span class="str">'object'</span>; <span class="cmt">// 历史遗留问题，null 在底层全为 0，而对象标签也是 000</span>
+<span class="kw">typeof</span> [] === <span class="str">'object'</span>;   <span class="cmt">// 判断数组请用 Array.isArray()</span>
+
+<span class="cmt">// 隐式转换神坑</span>
+[] == ![]; <span class="cmt">// true。(1) ![] 变成 false (2) [] 变 "", false 变 0 (3) "" 变 0。 0 == 0</span>
+<span class="num">1</span> + <span class="str">"2"</span>;   <span class="cmt">// "12" (加号遇字符串则拼接)</span>
+<span class="num">1</span> - <span class="str">"2"</span>;   <span class="cmt">// -1 (减号强转数字计算)</span></pre>
+  </section>
+
+  <!-- 2. 流程控制与函数 -->
+  <section class="card">
+    <h2>2. 流程控制与函数机制</h2>
+    
+    <h3>循环的本质区别</h3>
+    <table>
+      <tr>
+        <th>语法</th>
+        <th>作用域</th>
+        <th>核心特点</th>
+      </tr>
+      <tr>
+        <td><code>for...in</code></td>
+        <td>对象 (Object)</td>
+        <td>遍历对象的<strong>可枚举属性的键名(Key)</strong>，会遍历到原型链上的属性！</td>
+      </tr>
+      <tr>
+        <td><code>for...of</code></td>
+        <td>可迭代对象 (Iterable)</td>
+        <td>ES6 新增，遍历对象的<strong>键值(Value)</strong>。适用于 Array, Map, Set, String，不适用于普通对象。</td>
+      </tr>
+    </table>
+
+    <h3>函数定义与箭头函数</h3>
+<pre><span class="cmt">// 1. 函数声明 (整体提升)</span>
+<span class="kw">function</span> <span class="fn">foo</span>() {}
+
+<span class="cmt">// 2. 函数表达式 (仅变量提升，赋初值前调用会报错)</span>
+<span class="kw">const</span> bar = <span class="kw">function</span>() {};
+
+<span class="cmt">// 3. 箭头函数 (Arrow Function) 的四大缺失：</span>
+<span class="cmt">// - 没有自己的 this (继承外层词法作用域)</span>
+<span class="cmt">// - 没有 arguments 对象 (请用剩余参数 ...args 替代)</span>
+<span class="cmt">// - 不能作为构造函数 (不能 new)</span>
+<span class="cmt">// - 没有 prototype 属性</span>
+<span class="kw">const</span> arrow = <span class="fn">(...args)</span> =&gt; { <span class="kw">return</span> args[<span class="num">0</span>]; };</pre>
+  </section>
+
+  <!-- 3. 作用域与闭包 -->
+  <section class="card">
+    <h2>3. 作用域 (Scope) 与 闭包 (Closure)</h2>
+    <p><strong>作用域链：</strong> 当查找变量时，如果当前作用域没有，就会顺着外层词法作用域往上找，直到全局作用域。</p>
+    
+    <div style="background: #fff3cd; padding: 10px; border-left: 4px solid #ffc107; margin: 10px 0;">
+      <strong>闭包的本质：</strong> 闭包 = 函数 + 该函数声明时所处的词法环境。<strong>简单来说：内层函数引用了外层函数的变量，且内层函数被暴露到了外部。</strong>
+    </div>
+
+<pre><span class="kw">function</span> <span class="fn">createCounter</span>() {
+  <span class="kw">let</span> count = <span class="num">0</span>; <span class="cmt">// 私有变量，常驻内存不被销毁</span>
+  <span class="kw">return function</span>() {
+    <span class="kw">return</span> ++count;
+  };
+}
+<span class="kw">const</span> counter = <span class="fn">createCounter</span>();
+<span class="fn">console.log</span>(counter()); <span class="cmt">// 1</span>
+<span class="fn">console.log</span>(counter()); <span class="cmt">// 2</span>
+<span class="cmt">// 闭包的应用场景：1. 数据私有化(封装)；2. 防抖节流；3. 柯里化 (Currying)。</span>
+<span class="cmt">// 注意：大量使用闭包会导致内存泄漏，需手动置为 null 释放。</span></pre>
+  </section>
+
+  <!-- 4. this 与 原型链 -->
+  <section class="card">
+    <h2>4. this 指向与面向对象 (OOP)</h2>
+    
+    <h3>this 的四种绑定规则</h3>
+    <ol>
+      <li><strong>默认绑定：</strong> 独立函数调用 <code>fn()</code>，非严格模式指向 <code>window</code>，严格模式为 <code>undefined</code>。</li>
+      <li><strong>隐式绑定：</strong> 对象调用 <code>obj.fn()</code>，<code>this</code> 指向 <code>obj</code>。</li>
+      <li><strong>显式绑定：</strong> <code>call / apply / bind</code>。<code>call/apply</code> 立即执行（传参方式不同），<code>bind</code> 返回新函数。</li>
+      <li><strong>new 绑定：</strong> 指向新创建的实例对象。</li>
+    </ol>
+
+    <h3>原型与原型链 (Prototype Chain)</h3>
+    <p>在 JS 中，万物皆对象。当你访问对象的一个属性时，如果自身没有，就会去它的 <code>__proto__</code> (隐式原型) 上找，也就是其构造函数的 <code>prototype</code> (显式原型)。</p>
+    
+<pre><span class="cmt">// 核心公式，死记硬背：</span>
+实例对象.__proto__ === 构造函数.prototype
+
+<span class="cmt">// 原型链的尽头：</span>
+Object.prototype.__proto__ === <span class="kw">null</span>
+
+<span class="cmt">// 继承的终极方案：寄生组合式继承 (ES6 class extends 的底层原理)</span>
+<span class="kw">function</span> <span class="fn">Parent</span>(name) { <span class="kw">this</span>.name = name; }
+<span class="kw">function</span> <span class="fn">Child</span>(name, age) {
+  Parent.<span class="fn">call</span>(<span class="kw">this</span>, name); <span class="cmt">// 继承属性</span>
+  <span class="kw">this</span>.age = age;
+}
+Child.prototype = Object.<span class="fn">create</span>(Parent.prototype); <span class="cmt">// 继承方法</span>
+Child.prototype.constructor = Child; <span class="cmt">// 修复构造函数指向</span></pre>
+  </section>
+
+</body>
+</html>

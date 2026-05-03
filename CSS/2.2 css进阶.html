@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2.2 CSS3 进阶 </title>
+  <style>
+    /* --------------------------------------------------
+       1. CSS 变量 (Variables) & 根配置
+    -------------------------------------------------- */
+    :root {
+      /* 基础变量 */
+      --primary-color: #42b983;
+      --secondary-color: #35495e;
+      --accent-color: #ff7675;
+      --bg-color: #f4f9f6;
+      --card-bg: #ffffff;
+      /* 扩展：派生变量 */
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.1);
+      --shadow-lg: 0 10px 30px rgba(66, 185, 131, 0.2);
+      /* 响应式断点变量 (实验性思路) */
+      --desktop-width: 1200px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--secondary-color);
+      padding: 2rem;
+      line-height: 1.6;
+    }
+
+    h1 { text-align: center; margin-bottom: 3rem; color: var(--primary-color); }
+    h2 { margin: 2rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--primary-color); }
+    .card { background: var(--card-bg); padding: 1.5rem; border-radius: 12px; box-shadow: var(--shadow-sm); margin-bottom: 2rem; }
+
+    /* --------------------------------------------------
+       2. 弹性盒子 Flexbox
+    -------------------------------------------------- */
+    .flex-container {
+      display: flex;
+      flex-direction: row; /* row-reverse, column, column-reverse */
+      flex-wrap: wrap;     /* nowrap, wrap-reverse */
+      justify-content: space-around; /* flex-start, flex-end, center, space-between, space-evenly */
+      align-items: center;  /* flex-start, flex-end, center, baseline, stretch */
+      gap: 15px;            /* 现代浏览器直接支持 flex 间距 */
+      background: #eee;
+      padding: 10px;
+      min-height: 150px;
+    }
+
+    .flex-item {
+      flex: 0 1 auto; /* 简写: flex-grow, flex-shrink, flex-basis */
+      background: var(--primary-color);
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    /* 经典：骰子布局 (3点) */
+    .dice {
+      display: flex;
+      justify-content: space-between;
+      width: 100px; height: 100px; background: #333; padding: 10px; border-radius: 10px;
+    }
+    .dice .dot { width: 20px; height: 20px; background: white; border-radius: 50%; }
+    .dice .dot:nth-child(2) { align-self: center; }
+    .dice .dot:nth-child(3) { align-self: flex-end; }
+
+    /* --------------------------------------------------
+       3. 网格布局 Grid
+    -------------------------------------------------- */
+    .grid-container {
+      display: grid;
+      /* repeat, minmax, auto-fill/auto-fit 核心用法 */
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-rows: auto;
+      gap: 20px;
+    }
+    .grid-item {
+      background: var(--secondary-color);
+      color: white;
+      padding: 2rem;
+      border-radius: 8px;
+      display: grid;
+      place-items: center; /* 居中神器 */
+    }
+
+    /* --------------------------------------------------
+       4. 响应式单位 & 函数
+    -------------------------------------------------- */
+    .responsive-text {
+      /* clamp(min, preferred, max): 响应式字体的终极方案 */
+      font-size: clamp(1rem, 5vw, 2.5rem);
+      width: calc(100% - 40px);
+      margin: 10px auto;
+    }
+
+    /* --------------------------------------------------
+       5. CSS3 新增选择器与属性
+    -------------------------------------------------- */
+    /* :is(), :where() 简化写法 */
+    :is(article, section) h2 { color: var(--accent-color); }
+    
+    /* :not() 排除 */
+    .list-item:not(:last-child) { border-bottom: 1px solid #ddd; }
+
+    /* 装饰属性 */
+    .decor-box {
+      aspect-ratio: 16 / 9; /* 宽高比控制 */
+      border-radius: 20px;
+      box-shadow: var(--shadow-lg);
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      display: grid;
+      place-items: center;
+      color: white;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* --------------------------------------------------
+       6. 进阶视觉特效 (Filter, Blend, Clip)
+    -------------------------------------------------- */
+    .effect-group { display: flex; gap: 20px; flex-wrap: wrap; }
+    
+    .blur-box { filter: blur(4px); }
+    .blur-box:hover { filter: blur(0); transition: 0.3s; }
+
+    .blend-box {
+      width: 200px; height: 100px;
+      background: url('https://via.placeholder.com/200x100') blue;
+      background-blend-mode: multiply; /* 混合模式 */
+    }
+
+    /* 玻璃拟态 (Backdrop-filter) */
+    .glass {
+      position: absolute;
+      width: 70%; height: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 15px;
+    }
+
+    /* clip-path 遮罩 */
+    .clipped {
+      width: 100px; height: 100px;
+      background: var(--accent-color);
+      clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); /* 菱形 */
+    }
+
+    /* --------------------------------------------------
+       7. 媒体查询 (Media Queries)
+    -------------------------------------------------- */
+    @media (max-width: 768px) {
+      body { padding: 1rem; }
+      .flex-container { flex-direction: column; }
+    }
+
+  </style>
+</head>
+<body>
+
+  <h1>CSS3 进阶特性实验室</h1>
+
+  <!-- 1. 变量演示 -->
+  <section class="card">
+    <h2>1. CSS 变量 (Custom Properties)</h2>
+    <p>当前主题色：<code style="color: var(--primary-color)">var(--primary-color)</code></p>
+    <p>扩展技巧：变量可以配合 JS 动态修改，实现“一键换肤”。</p>
+  </section>
+
+  <!-- 2. Flexbox 演示 -->
+  <section class="card">
+    <h2>2. Flex 布局全解析</h2>
+    <div class="flex-container">
+      <div class="flex-item" style="flex-grow: 2;">Grow: 2</div>
+      <div class="flex-item" style="flex-grow: 1;">Grow: 1</div>
+      <div class="flex-item">Basis: auto</div>
+    </div>
+    
+    <h4>经典案例：骰子 (Dice)</h4>
+    <div class="dice">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+  </section>
+
+  <!-- 3. Grid 布局演示 -->
+  <section class="card">
+    <h2>3. Grid 网格布局 (响应式自动排列)</h2>
+    <div class="grid-container">
+      <div class="grid-item">Card 1</div>
+      <div class="grid-item" style="grid-area: span 1 / span 2;">Card 2 (Span 2)</div>
+      <div class="grid-item">Card 3</div>
+      <div class="grid-item">Card 4</div>
+    </div>
+  </section>
+
+  <!-- 4. 响应式与单位 -->
+  <section class="card">
+    <h2>4. 响应式单位与函数</h2>
+    <div class="responsive-text">我使用了 clamp() 函数，缩放浏览器试试！</div>
+    <ul>
+      <li><code>rem / em</code>: 相对于根元素/父元素字体。</li>
+      <li><code>vw / vh</code>: 视口宽高百分比。</li>
+      <li><code>vmax / vmin</code>: 视口长边/短边。</li>
+      <li><code>calc(100% - 20px)</code>: 动态计算。</li>
+    </ul>
+  </section>
+
+  <!-- 5. 视觉效果 -->
+  <section class="card">
+    <h2>5. CSS3 视觉特效</h2>
+    <div class="effect-group">
+      <div class="decor-box" style="width: 300px;">
+        <div class="glass"></div>
+        <span>Backdrop Filter</span>
+      </div>
+      <div class="clipped"></div>
+      <div class="blend-box"></div>
+      <img src="https://via.placeholder.com/150" style="object-fit: cover; width:100px; height:100px; border-radius: 50%;" alt="object-fit">
+    </div>
+  </section>
+
+  <!-- 6. 扩展知识点 -->
+  <section class="card" style="border-left: 5px solid var(--accent-color);">
+    <h2>6. 扩展：CSS 现代前沿 (Must Know)</h2>
+    <ul>
+      <li><strong>Container Queries:</strong> <code>@container</code>。根据父容器大小而非视口改变样式，真正的组件化布局。</li>
+      <li><strong>CSS Layers:</strong> <code>@layer</code>。显式控制样式优先级，解决权重冲突地狱。</li>
+      <li><strong>Subgrid:</strong> 允许子元素继承父元素的网格行列定义，实现嵌套对齐。</li>
+      <li><strong>Scroll-driven Animations:</strong> 无需 JS 即可根据滚动位置触发动画。</li>
+    </ul>
+  </section>
+
+</body>
+</html>

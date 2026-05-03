@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2.2 ES6 特性 - 现代化 JS 复习手册</title>
+  <style>
+    :root {
+      --primary: #42b983;
+      --bg: #f8faf9;
+      --card: #ffffff;
+      --code-bg: #2d3436;
+      --text: #2c3e50;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', system-ui; background: var(--bg); color: var(--text); padding: 2rem; line-height: 1.6; }
+    h1 { text-align: center; color: var(--primary); margin-bottom: 2rem; }
+    h2 { border-left: 5px solid var(--primary); padding-left: 15px; margin: 2rem 0 1rem; color: #35495e; }
+    h3 { color: var(--primary); font-size: 1.1rem; margin: 1rem 0 0.5rem; }
+    
+    .card { background: var(--card); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; }
+    
+    pre { background: var(--code-bg); color: #a9b7c6; padding: 1rem; border-radius: 8px; overflow-x: auto; font-family: 'Consolas', monospace; font-size: 0.95rem; margin: 10px 0; }
+    .kw { color: #cc7832; } .str { color: #6a8759; } .fn { color: #ffc66d; } .cmt { color: #808080; }
+
+    table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+    th, td { border: 1px solid #e0e0e0; padding: 10px; text-align: left; }
+    th { background: #eaf4ef; }
+    .badge { background: var(--primary); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; }
+  </style>
+</head>
+<body>
+
+  <h1>ES6+ 现代化工程开发手册</h1>
+
+  <!-- 1. 结构与增强 -->
+  <section class="card">
+    <h2>1. 变量、结构与字符串</h2>
+    <div class="grid">
+      <div>
+        <h3>解构赋值 (Destructuring)</h3>
+<pre><span class="cmt">// 对象解构 + 重命名 + 默认值</span>
+<span class="kw">const</span> { name: userName, age = <span class="num">18</span> } = user;
+
+<span class="cmt">// 嵌套解构</span>
+<span class="kw">const</span> { info: { id } } = response;
+
+<span class="cmt">// 数组解构 (交换变量)</span>
+[a, b] = [b, a];</pre>
+      </div>
+      <div>
+        <h3>模板字符串 (Template Literals)</h3>
+<pre><span class="cmt">// 标签模板 (Tag Functions) - 常用作防 XSS 或多语言</span>
+<span class="kw">function</span> <span class="fn">highlight</span>(strings, ...values) {
+  <span class="kw">return</span> strings[<span class="num">0</span>] + <span class="str">`&lt;span&gt;`</span> + values[<span class="num">0</span>] + <span class="str">`&lt;/span&gt;`</span>;
+}
+<span class="kw">const</span> msg = <span class="fn">highlight</span><span class="str">`Hello ${name}`</span>;</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Symbol 与 集合 -->
+  <section class="card">
+    <h2>2. Symbol 与 集合 (Map/Set)</h2>
+    <div class="grid">
+      <div>
+        <h3>Symbol: 独一无二的键</h3>
+        <ul>
+          <li><strong>用途：</strong> 作为对象属性名，防止属性被覆盖。</li>
+          <li><strong>Symbol.for()：</strong> 全局注册表，如果键名相同则返回同一个 Symbol。</li>
+          <li><strong>隐藏性：</strong> <code>for...in</code> 遍历不到，需用 <code>Object.getOwnPropertySymbols()</code>。</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Map vs Object</h3>
+        <table>
+          <tr><th>特性</th><th>Object</th><th>Map</th></tr>
+          <tr><td>键的类型</td><td>String/Symbol</td><td><strong>任意类型</strong> (包括对象)</td></tr>
+          <tr><td>顺序</td><td>无序/复杂</td><td><strong>有序</strong> (插入顺序)</td></tr>
+          <tr><td>大小</td><td>需手动计算</td><td><code>map.size</code></td></tr>
+        </table>
+      </div>
+    </div>
+    
+    <h3>WeakMap & WeakSet (弱引用)</h3>
+    <p>键必须是对象。<strong>其核心价值在于不计入垃圾回收 (GC) 引用计数</strong>。当键指向的对象在外部被销毁时，WeakMap 内部自动清理，防止内存泄漏。常用于 DOM 节点存储元数据。</p>
+  </section>
+
+  <!-- 3. Proxy 与 Reflect -->
+  <section class="card">
+    <h2>3. 代理与反射 (Proxy & Reflect)</h2>
+    <p>这是 Vue3 响应式的核心。它能拦截对象的所有操作（读取、赋值、删除、枚举等）。</p>
+<pre><span class="kw">const</span> proxy = <span class="kw">new</span> <span class="fn">Proxy</span>(target, {
+  <span class="fn">get</span>(target, key, receiver) {
+    <span class="fn">console.log</span>(<span class="str">`读取了 ${key}`</span>);
+    <span class="kw">return</span> Reflect.<span class="fn">get</span>(target, key, receiver); <span class="cmt">// 配合 Reflect 保持 context</span>
+  },
+  <span class="fn">set</span>(target, key, value) {
+    <span class="kw">if</span> (key === <span class="str">'age'</span> && value > <span class="num">100</span>) <span class="kw">throw</span> <span class="kw">Error</span>();
+    <span class="kw">return</span> Reflect.<span class="fn">set</span>(...arguments);
+  }
+});</pre>
+  </section>
+
+  <!-- 4. Class 类与继承 -->
+  <section class="card">
+    <h2>4. Class 类与模块化</h2>
+    <div class="grid">
+      <div>
+        <h3>类的构成</h3>
+<pre><span class="kw">class</span> <span class="fn">User</span> {
+  <span class="kw">static</span> type = <span class="str">'HUMAN'</span>; <span class="cmt">// 静态属性</span>
+  <span class="kw">constructor</span>(name) { <span class="kw">this</span>._name = name; }
+  
+  <span class="kw">get</span> <span class="fn">name</span>() { <span class="kw">return</span> <span class="kw">this</span>._name; } <span class="cmt">// getter</span>
+  <span class="fn">sayHi</span>() { <span class="fn">console.log</span>(<span class="str">'Hi'</span>); }   <span class="cmt">// 原型方法</span>
+}
+
+<span class="kw">class</span> <span class="fn">Student</span> <span class="kw">extends</span> <span class="fn">User</span> {
+  <span class="kw">constructor</span>(name, score) {
+    <span class="kw">super</span>(name); <span class="cmt">// 必须先调用 super</span>
+    <span class="kw">this</span>.score = score;
+  }
+}</pre>
+      </div>
+      <div>
+        <h3>ES Module (ESM)</h3>
+        <ul>
+          <li><strong>命名导出：</strong> <code>export const a = 1;</code></li>
+          <li><strong>默认导出：</strong> <code>export default b;</code></li>
+          <li><strong>动态导入：</strong> <code>import('./mod.js').then(...)</code> 
+            <span class="badge">代码拆分关键</span>
+          </li>
+        </ul>
+        <p><small>注：ESM 是编译时加载（静态），CommonJS 是运行时加载。</small></p>
+      </div>
+    </div>
+  </section>
+
+</body>
+</html>
